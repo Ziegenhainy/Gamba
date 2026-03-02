@@ -20,16 +20,24 @@ def main():
                 bet = -1
 
         randomSlots = [rd.randint(0, 100) for _ in range(9)]
-        delay = 0.1
+        delay = 0.05
         money -= bet
         for i in it.count():
-            if i >= 20:
-                delay *= 1+rd.random()*0.5
+            if i >= 50:
+                delay *= 1+rd.random()*0.4
             print("[", end="")
             randomSlots.pop(0)
             randomSlots.append(rd.randint(0,100))
             for n in randomSlots:
-                print(str(n).center(4), end="|")
+                if n > 90:
+                    print("\033[35m", end="")
+                elif n > 75:
+                    print("\033[34m", end="")
+                elif n > 50:
+                    print("\033[32m", end="")
+                else:
+                    print("\033[31m", end="")
+                print(str(n).center(4), end="\033[37m|")
             print("\b]")
             print("                      ^^", end="\r\033[A")
             t.sleep(delay)
@@ -37,7 +45,12 @@ def main():
                 break
 
         winnings = int(bet * (randomSlots[4]/50))
-        print(f"\n\nYou Won {winnings}$!")
+        if winnings > bet:
+            print(f"\n\nYou Won {winnings-bet}$!")
+        elif winnings < bet:
+            print(f"\n\nYou Lost {bet-winnings}$ :(")
+        else:
+            print(f"\n\nNothing Happened Lol :3")
         money += winnings
 
 if __name__ == "__main__":
