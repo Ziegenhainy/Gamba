@@ -13,10 +13,10 @@ def main():
             try:
                 bet = int(betQuery)
             except ValueError:
-                print("\033[91mYOU ARE STUPID! ENTER A NUMBER!", end="\033[37m\r\033[A")
+                print("\x1b[2K\033[91mYOU ARE STUPID! ENTER A NUMBER!", end="\033[37m\r\033[A")
 
             if money < bet:
-                print("\033[91mYOU ARE BROKE! BET LESS!", end="\033[37m\r\033[A")
+                print("\x1b[2K\033[91mYOU ARE BROKE! BET LESS!", end="\033[37m\r\033[A")
                 bet = -1
 
         randomSlots = [rd.randint(0, 100) for _ in range(9)]
