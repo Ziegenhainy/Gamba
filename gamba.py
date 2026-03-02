@@ -14,7 +14,6 @@ def main():
                 bet = int(betQuery)
             except ValueError:
                 print("\x1b[2K\033[91mYOU ARE STUPID! ENTER A NUMBER!", end="\033[37m\r\033[A")
-
             if money < bet:
                 print("\x1b[2K\033[91mYOU ARE BROKE! BET LESS!", end="\033[37m\r\033[A")
                 bet = -1
@@ -60,4 +59,8 @@ def main():
         money += winnings
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nGoodbye Lol")
+        exit()
