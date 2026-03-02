@@ -24,7 +24,10 @@ def main():
         money -= bet
         for i in it.count():
             if i >= 50:
-                delay *= 1+rd.random()*0.4
+                if delay > 0.5:
+                    delay *= 1+rd.random()
+                else:
+                    delay *= 1+rd.random()*0.3
             print("[", end="")
             randomSlots.pop(0)
             randomSlots.append(rd.randint(0,100))
@@ -39,7 +42,7 @@ def main():
                     print("\033[31m", end="")
                 print(str(n).center(4), end="\033[37m|")
             print("\b]")
-            print("                      ^^", end="\r\033[A")
+            print("                    |-^^-|", end="\r\033[A")
             t.sleep(delay)
             if delay > 1.5:
                 break
