@@ -1,15 +1,38 @@
 import random as rd 
 import time as t
 import itertools as it
+import os
+import json
 
 
 def main():
-    money = 1000
+    fileExist = os.path.isfile("money.json")
+    if fileExist == False:
+        data = {
+            "money": "1000",
+        }
+        jsondata = json.dumps(data, indent=2)
+        with open("money.json", "w") as f:
+            f.write(jsondata)
+    else:
+        with open("money.json", "r") as f:
+            data = json.load(f)
+    money = int(data['money'])
     
     while True:
         bet = -1
         while bet == -1:
-            betQuery = input(f"\x1b[2KYou have {money}$ left, how much do you wanna gamba? ")
+            betQuery = input(f"\x1b[2KYou have {money}$ left, how much do you wanna gamba?(quit with q) ")
+            if betQuery == "q":
+                data = {
+                    "money": f"{money}",
+                }
+                jsondata = json.dumps(data, indent=2)
+                with open("money.json", "w") as f:
+                    f.write(jsondata)
+                    f.close()
+                print("Good bye. Your money has been saved")
+                exit()
             try:
                 bet = int(betQuery)
             except ValueError:
