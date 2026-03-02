@@ -48,7 +48,10 @@ def main():
         if winnings > bet:
             print(f"\n\nYou Won {winnings-bet}$!")
         elif winnings < bet:
-            print(f"\n\nYou Lost {bet-winnings}$ :(")
+            if winnings == 0:
+                print(f"\n\nYou Lost it all lol :3c")
+            else:
+                print(f"\n\nYou Lost {bet-winnings}$ :(")
         else:
             print(f"\n\nNothing Happened Lol :3")
         money += winnings
