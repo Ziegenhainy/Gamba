@@ -1,26 +1,50 @@
 import random as rd 
 import time as t
 import itertools as it
+import platformdirs
+import json
+import os
 
+savefilePath = platformdirs.user_data_dir() + "/ziegenGamba/saveFile"
+
+(platformdirs.user_data_path() / "ziegenGamba").mkdir(exist_ok = True)
+
+data = {
+    "money" : 1000
+}
+
+
+def setMoney(newMoney: int) -> None:
+    data["money"] = newMoney
+    with open(savefilePath, "w") as f:
+        f.write(json.dumps(data, indent=3))
+
+def getMoney() -> int:
+    return data["money"]
+
+try:
+    with open(savefilePath, "r") as f:
+        data = json.loads(f.read())
+except FileNotFoundError, json.decoder.JSONDecodeError:
+    with open(savefilePath, "w") as f:
+        f.write(json.dumps(data, indent=3))
 
 def main():
-    money = 1000
-    
     while True:
         bet = -1
         while bet == -1:
-            betQuery = input(f"\x1b[2KYou have {money}$ left, how much do you wanna gamba? ")
+            betQuery = input(f"\x1b[2KYou have {getMoney()}$ left, how much do you wanna gamba? ")
             try:
                 bet = int(betQuery)
             except ValueError:
                 print("\x1b[2K\033[91mYOU ARE STUPID! ENTER A NUMBER!", end="\033[37m\r\033[A")
-            if money < bet:
+            if getMoney() < bet:
                 print("\x1b[2K\033[91mYOU ARE BROKE! BET LESS!", end="\033[37m\r\033[A")
                 bet = -1
 
         randomSlots = [rd.randint(0, 100) for _ in range(9)]
         delay = 0.05
-        money -= bet
+        setMoney(getMoney() - bet)
         for i in it.count():
             if i >= 50:
                 if delay > 0.5:
@@ -56,7 +80,8 @@ def main():
                 print(f"\n\nYou Lost {bet-winnings}$ :(")
         else:
             print(f"\n\nNothing Happened Lol :3")
-        money += winnings
+        setMoney(getMoney() + winnings)
+        
 
 if __name__ == "__main__":
     try:
