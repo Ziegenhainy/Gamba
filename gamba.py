@@ -1,5 +1,6 @@
 import random as rd 
 import time as t
+import threading
 import itertools as it
 import platformdirs
 import json
@@ -9,9 +10,29 @@ savefilePath = platformdirs.user_data_dir() + "/ziegenGamba/saveFile"
 
 (platformdirs.user_data_path() / "ziegenGamba").mkdir(exist_ok = True)
 
+
+MAX_RENT_TIME = 60
+
 data = {
-    "money" : 1000
+    "money"       : 1000,
+    "rentTime"    : MAX_RENT_TIME,
+    "timeAlive"   : 0,
+    "currentRent" : 500
 }
+
+def rentTimeLoop():
+    global data
+    while True:
+        data["rentTime"] = data.get("rentTime", MAX_RENT_TIME) - 1
+        data["timeAlive"] = data.get("timeAlive", 0) + 1
+        if data["rentTime"] < 0:
+            break
+        print(f"\033[33m\033[s\033[H\x1b[2K\r[{data["rentTime"]}s LEFT!]\033[u\033[39m", end="")
+        t.sleep(1)
+    print(f"\nYOU DIDNT PAY YOUR RENT! GAME OVER. YOU SURVIVED {data["timeAlive"]} SECONDS")
+    with open(savefilePath, "w") as f:
+        f.write("")
+    os._exit(0)
 
 
 def setMoney(newMoney: int) -> None:
@@ -33,6 +54,7 @@ miningAnimation = [
 ]
 
 def minesLoop() -> None:
+    print("\033c")
     while True:
         for anim in miningAnimation:
             print(f"you have {getMoney()} Money")
@@ -41,6 +63,7 @@ def minesLoop() -> None:
         setMoney(getMoney()+1)
 
 def slotsLoop() -> None:
+    print("\033c")
     while True:
         bet = -1
         while bet == -1:
@@ -53,6 +76,7 @@ def slotsLoop() -> None:
                 print("\x1b[2K\033[91mYOU ARE BROKE! BET LESS!", end="\033[37m\r\033[A")
                 bet = -1
 
+        print("\033c")
         randomSlots = [rd.randint(0, 100) for _ in range(9)]
         delay = 0.05
         setMoney(getMoney() - bet)
@@ -102,10 +126,15 @@ def main():
         with open(savefilePath, "w") as f:
             f.write(json.dumps(data, indent=3))
     
-    while True:
+    data["currentRent"] = data.get("currentRent", 500)
+
+    t = threading.Thread(target=rentTimeLoop)
+    t.start()
+    while t.is_alive():
         print("What do u wanna do? :3")
         print("[1] Never Stop Gambling")
         print("[2] I Yearn for the mines")
+        print(f"[3] Pay Rent  ({data["currentRent"]}$)")
         menuQuery = input("\x1b[2K")
         try:
             match menuQuery:
@@ -113,14 +142,26 @@ def main():
                     slotsLoop()
                 case "2":
                     minesLoop()
+                case "3":
+                    if data["money"] < data["currentRent"]:
+                        print("\x1b[2K\033[91mYour Too Broke! Get Your Cash Up!", end="\033[37m\r\033[5A")
+                    else:
+                        data["money"] -= data["currentRent"]
+                        data["currentRent"] *= 2
+                        data["rentTime"] += MAX_RENT_TIME
+                        print("\033c")
+                        print(f"Success! New Rent is {data["currentRent"]}")
+                        with open(savefilePath, "w") as f:
+                            f.write(json.dumps(data, indent=3))
                 case _:
-                    print("\x1b[2K\033[91mThats not an option!", end="\033[37m\r\033[A\033[A\033[A\033[A")
+                    print("\x1b[2K\033[91mThats not an option!", end="\033[37m\r\033[5A")
         except KeyboardInterrupt:
-            print()
+            print("\033c")
 
 if __name__ == "__main__":
+    print("\033c")
     try:
         main()
     except KeyboardInterrupt:
         print("\nGoodbye Lol")
-        exit()
+        os._exit(0)
