@@ -25,7 +25,7 @@ def getMoney() -> int:
 try:
     with open(savefilePath, "r") as f:
         data = json.loads(f.read())
-except FileNotFoundError, json.decoder.JSONDecodeError:
+except (FileNotFoundError, json.decoder.JSONDecodeError):
     with open(savefilePath, "w") as f:
         f.write(json.dumps(data, indent=3))
 
