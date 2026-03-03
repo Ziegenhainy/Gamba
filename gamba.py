@@ -94,6 +94,7 @@ def slotsLoop() -> None:
         setMoney(getMoney() + winnings)
 
 def main():
+    global data # this is evil and fucked up
     try:
         with open(savefilePath, "r") as f:
             data = json.loads(f.read())
