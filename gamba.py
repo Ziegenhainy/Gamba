@@ -22,14 +22,25 @@ def setMoney(newMoney: int) -> None:
 def getMoney() -> int:
     return data["money"]
 
-try:
-    with open(savefilePath, "r") as f:
-        data = json.loads(f.read())
-except (FileNotFoundError, json.decoder.JSONDecodeError):
-    with open(savefilePath, "w") as f:
-        f.write(json.dumps(data, indent=3))
 
-def main():
+miningAnimation = [
+    "[ ]⛏",
+    "[.]⛏",
+    "[,]⛏",
+    "[-]⛏",
+    "[x]⛏",
+    "[#]⛏"
+]
+
+def minesLoop() -> None:
+    while True:
+        for anim in miningAnimation:
+            print(f"you have {getMoney()} Money")
+            input(anim)
+            print("\033[A\033[A", end="")
+        setMoney(getMoney()+1)
+
+def slotsLoop() -> None:
     while True:
         bet = -1
         while bet == -1:
@@ -81,7 +92,30 @@ def main():
         else:
             print(f"\n\nNothing Happened Lol :3")
         setMoney(getMoney() + winnings)
-        
+
+def main():
+    try:
+        with open(savefilePath, "r") as f:
+            data = json.loads(f.read())
+    except (FileNotFoundError, json.decoder.JSONDecodeError):
+        with open(savefilePath, "w") as f:
+            f.write(json.dumps(data, indent=3))
+    
+    while True:
+        print("What do u wanna do? :3")
+        print("[1] Never Stop Gambling")
+        print("[2] I Yearn for the mines")
+        menuQuery = input("\x1b[2K")
+        try:
+            match menuQuery:
+                case "1":
+                    slotsLoop()
+                case "2":
+                    minesLoop()
+                case _:
+                    print("\x1b[2K\033[91mThats not an option!", end="\033[37m\r\033[A\033[A\033[A\033[A")
+        except KeyboardInterrupt:
+            print()
 
 if __name__ == "__main__":
     try:
