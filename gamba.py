@@ -17,7 +17,8 @@ data = {
     "money"       : 1000,
     "rentTime"    : MAX_RENT_TIME,
     "timeAlive"   : 0,
-    "currentRent" : 500
+    "currentRent" : 500,
+    "machines"    : 1
 }
 
 def rentTimeLoop():
@@ -77,7 +78,7 @@ def slotsLoop() -> None:
                 bet = -1
 
         print("\033c")
-        randomSlots = [rd.randint(0, 100) for _ in range(9)]
+        slotMachines = [[rd.randint(0, 100) for _ in range(9)] for _ in range(data["machines"])]
         delay = 0.05
         setMoney(getMoney() - bet)
         for i in it.count():
@@ -86,35 +87,43 @@ def slotsLoop() -> None:
                     delay *= 1+rd.random()
                 else:
                     delay *= 1+rd.random()*0.3
-            print("[", end="")
-            randomSlots.pop(0)
-            randomSlots.append(rd.randint(0,100))
-            for n in randomSlots:
-                if n > 90:
-                    print("\033[35m", end="")
-                elif n > 75:
-                    print("\033[34m", end="")
-                elif n > 50:
-                    print("\033[32m", end="")
-                else:
-                    print("\033[31m", end="")
-                print(str(n).center(4), end="\033[37m|")
-            print("\b]")
-            print("                    |-^^-|", end="\r\033[A")
+            print(end="\033[s")
+            for randomSlots in slotMachines:
+                print("[", end="")
+                randomSlots.pop(0)
+                randomSlots.append(rd.randint(0,100))
+                for n in randomSlots:
+                    if n > 90:
+                        print("\033[35m", end="")
+                    elif n > 75:
+                        print("\033[34m", end="")
+                    elif n > 50:
+                        print("\033[32m", end="")
+                    else:
+                        print("\033[31m", end="")
+                    print(str(n).center(4), end="\033[37m|")
+                print("\b]")
+            print("                    |-^^-|", end="\r\033[u")
             t.sleep(delay)
             if delay > 1.5:
                 break
-
-        winnings = int(bet * (randomSlots[4]/50))
+        
+        winnings = bet
+        for randomSlots in slotMachines:
+            winnings *= randomSlots[4]/50
+        
+        winnings = int(winnings)
+        
+        print(f"\033[{data["machines"]}B")
         if winnings > bet:
-            print(f"\n\nYou Won {winnings-bet}$!")
+            print(f"You Won {winnings-bet}$!")
         elif winnings < bet:
             if winnings == 0:
-                print(f"\n\nYou Lost it all lol :3c")
+                print(f"You Lost it all lol :3c")
             else:
-                print(f"\n\nYou Lost {bet-winnings}$ :(")
+                print(f"You Lost {bet-winnings}$ :(")
         else:
-            print(f"\n\nNothing Happened Lol :3")
+            print(f"Nothing Happened Lol :3")
         setMoney(getMoney() + winnings)
 
 def main():
@@ -127,6 +136,7 @@ def main():
             f.write(json.dumps(data, indent=3))
     
     data["currentRent"] = data.get("currentRent", 500)
+    data["machines"] = data.get("machines", 1)
 
     t = threading.Thread(target=rentTimeLoop)
     t.start()
@@ -135,6 +145,7 @@ def main():
         print("[1] Never Stop Gambling")
         print("[2] I Yearn for the mines")
         print(f"[3] Pay Rent  ({data["currentRent"]}$)")
+        print("[4] Buy More Slotmachines (100$)")
         menuQuery = input("\x1b[2K")
         try:
             match menuQuery:
@@ -144,7 +155,7 @@ def main():
                     minesLoop()
                 case "3":
                     if data["money"] < data["currentRent"]:
-                        print("\x1b[2K\033[91mYour Too Broke! Get Your Cash Up!", end="\033[37m\r\033[5A")
+                        print("\x1b[2K\033[91mYour Too Broke! Get Your Cash Up!", end="\033[37m\r\033[6A")
                     else:
                         data["money"] -= data["currentRent"]
                         data["currentRent"] *= 2
@@ -153,8 +164,18 @@ def main():
                         print(f"Success! New Rent is {data["currentRent"]}")
                         with open(savefilePath, "w") as f:
                             f.write(json.dumps(data, indent=3))
+                case "4":
+                    if data["money"] < 100:
+                        print("\x1b[2K\033[91mYour Too Broke! Get Your Cash Up!", end="\033[37m\r\033[6A")
+                    else:
+                        data["money"]    -= 100
+                        data["machines"] += 1
+                        print("\033c")
+                        print(f"Success! You Now Have {data["machines"]} Machines!")
+                        with open(savefilePath, "w") as f:
+                            f.write(json.dumps(data, indent=3))
                 case _:
-                    print("\x1b[2K\033[91mThats not an option!", end="\033[37m\r\033[5A")
+                    print("\x1b[2K\033[91mThats not an option!", end="\033[37m\r\033[6A")
         except KeyboardInterrupt:
             print("\033c")
 
