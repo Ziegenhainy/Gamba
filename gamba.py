@@ -57,11 +57,30 @@ miningAnimation = [
 def minesLoop() -> None:
     print("\033c")
     while True:
+        rockType = None
+        rockQuality = rd.randint(1,100)
+        rockReward=1
+
+        if rockQuality >= 100:
+            rockType = ("Diamonds","\033[96m")
+            rockReward = 100
+        elif rockQuality >= 91:
+            rockType = ("Gold","\033[93m")
+            rockReward = 10
+        elif rockQuality >= 81:
+            rockType = ("Copper","\033[33m")
+            rockReward = 5
+        
+
         for anim in miningAnimation:
             print(f"you have {getMoney()} Money")
+            print(end="\033[2K")
+            if rockType:
+                print(f"Found {rockType[0]}!{rockType[1]}", end="")
+            print()
             input(anim)
-            print("\033[A\033[A", end="")
-        setMoney(getMoney()+1)
+            print("\033[3A", end="\033[37m")
+        setMoney(getMoney()+rockReward)
 
 def slotsLoop() -> None:
     print("\033c")
