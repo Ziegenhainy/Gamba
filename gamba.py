@@ -1,3 +1,4 @@
+import phrases
 import random as rd 
 import time as t
 import threading
@@ -82,6 +83,16 @@ def minesLoop() -> None:
             print("\033[3A", end="\033[37m")
         setMoney(getMoney()+rockReward)
 
+def printPhrase(bet: int) -> None:
+    if getMoney() - bet*1.1 <= 0:
+        print(rd.choice(phrases.allInPhrases))
+    elif bet >= 100:
+        print(rd.choice(phrases.overHundredPhrases))
+    elif bet:
+        print(rd.choice(phrases.underHundredPhrases))
+    else:
+        print(rd.choice(phrases.zeroPhrases))
+
 def slotsLoop() -> None:
     print("\033c")
     while True:
@@ -99,7 +110,10 @@ def slotsLoop() -> None:
         print("\033c")
         slotMachines = [[rd.randint(0, 100) for _ in range(9)] for _ in range(data["machines"])]
         delay = 0.05
+
+        printPhrase(bet)
         setMoney(getMoney() - bet)
+
         for i in it.count():
             if i >= 50:
                 if delay > 0.5:
