@@ -103,8 +103,12 @@ def slotsLoop() -> None:
                 bet = int(betQuery)
             except ValueError:
                 print("\x1b[2K\033[91mYOU ARE STUPID! ENTER A NUMBER!", end="\033[37m\r\033[A")
+                continue
             if getMoney() < bet:
                 print("\x1b[2K\033[91mYOU ARE BROKE! BET LESS!", end="\033[37m\r\033[A")
+                bet = -1
+            elif bet < 0:
+                print("\x1b[2K\033[91mYOU CANT BET NEGATIVE MONEY DUMBASS!", end="\033[37m\r\033[A")
                 bet = -1
 
         print("\033c")
@@ -207,6 +211,11 @@ def main():
                         print(f"Success! You Now Have {data["machines"]} Machines!")
                         with open(savefilePath, "w") as f:
                             f.write(json.dumps(data, indent=3))
+                case "DELETE_SAVE":
+                    with open(savefilePath, "w") as f:
+                        f.write("")
+                        print("ok its gone :3")
+                        os._exit(0)
                 case _:
                     print("\x1b[2K\033[91mThats not an option!", end="\033[37m\r\033[6A")
         except KeyboardInterrupt:
